@@ -13,6 +13,8 @@ import { getDotComAPIEndpoint } from '../../lib/api'
 import { Repository } from '../../models/repository'
 import { Dispatcher } from '../dispatcher'
 import { setGlobalConfigValue } from '../../lib/git'
+import { PopupType } from '../../models/popup'
+import { RepositorySettingsTab } from '../repository-settings/repository-settings'
 
 interface ICommitMessageAvatarState {
   readonly isPopoverOpen: boolean
@@ -176,6 +178,15 @@ export class CommitMessageAvatar extends React.Component<
             ))}
           </Select>
         </Row>
+        <Row>
+          <div>
+            You can also choose an email only for this repository from the{' '}
+            <LinkButton onClick={this.onRepositorySettingsClick}>
+              repository settings
+            </LinkButton>
+            .
+          </div>
+        </Row>
         <Row className="button-row">
           <Button onClick={this.onIgnoreClick} tooltip="Ignore" type="button">
             Ignore
@@ -186,6 +197,21 @@ export class CommitMessageAvatar extends React.Component<
         </Row>
       </Popover>
     )
+  }
+
+  private onRepositorySettingsClick = () => {
+    this.closePopover()
+
+    const repository = this.props.repository
+    if (repository === null) {
+      return
+    }
+
+    this.props.dispatcher.showPopup({
+      type: PopupType.RepositorySettings,
+      repository,
+      initialSelectedTab: RepositorySettingsTab.GitConfig,
+    })
   }
 
   private onIgnoreClick = (event: React.MouseEvent<HTMLButtonElement>) => {
